@@ -36,11 +36,6 @@ QVector<T> HilbertTransform::conv(const QVector<T>& f, const QVector<T>& g) cons
     return out;
 }
 
-// Silnia
-float HilbertTransform::factorial(int n) const {
-    return (n <= 1) ? 1 : n * factorial(n - 1);
-}
-
 // Filtracja sygnału
 QVector<float> HilbertTransform::filter(const QVector<float>& signal, float fc1, float fc2) const {
     const float M = 5.0;
