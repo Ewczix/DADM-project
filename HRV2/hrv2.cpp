@@ -262,17 +262,6 @@ QPair<QVector<double>, QVector<double>> HRV2::getPoincarePlot() {
     return poincare_plot;
 }
 
-void generateEllipsePoints(double a, double b, double xCenter, double yCenter, int numPoints, QVector<double> &xData, QVector<double> &yData) {
-    xData.resize(numPoints);
-    yData.resize(numPoints);
-
-    for (int i = 0; i < numPoints; ++i) {
-        double theta = 2 * M_PI * i / (numPoints - 1); // Kat w radianach
-        xData[i] = xCenter + a * cos(theta);
-        yData[i] = yCenter + b * sin(theta);
-    }
-}
-
 void HRV2::createEllipse(int numPoints) {
     QVector<double> x(numPoints);
     QVector<double> y(numPoints);
