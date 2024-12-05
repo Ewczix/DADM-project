@@ -170,11 +170,6 @@ HEART_CLASS::AnomalyDetectionResult HEART_CLASS::detectAnomalies(const QVector<d
         }
         distance = qSqrt(distance);
         distances.append(distance);
-
-        if (distance > 12.5) {
-            result.anomalies.append(segment);
-            result.anomalyIndices.append(startIdx);
-        }
     }
 
     double meanDist = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
@@ -184,7 +179,7 @@ HEART_CLASS::AnomalyDetectionResult HEART_CLASS::detectAnomalies(const QVector<d
                                           }) / distances.size());
 
     for (int i = 0; i < distances.size(); ++i) {
-        if (distances[i] > 2 * stdDev + meanDist) {
+        if (distances[i] > stdDev + meanDist) {
             int startIdx = i * motifLength;
             QVector<double> segment(ecgSignal.mid(startIdx, motifLength));
             result.anomalies.append(segment);
