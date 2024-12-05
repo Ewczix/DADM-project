@@ -31,8 +31,8 @@ unsigned int HEART_CLASS::calculateStartingLength(double samplingFrequency) {
 QVector<QVector<double>> HEART_CLASS::extractSubsequences(const QVector<double>& signal, int length) {
     QVector<QVector<double>> subsequences;
     unsigned int n = signal.size();
-    unsigned int subsequencesLength = (n-(n%length))/length;
-    for (int i = 0; i <= subsequencesLength; ++i) {
+    unsigned int subsequencesNum = (n-(n%length))/length;
+    for (int i = 0; i < subsequencesNum; ++i) {
         subsequences.append(QVector<double>(signal.mid(i*length, length)));
     }
     return subsequences;
@@ -129,22 +129,24 @@ HEART_CLASS::Motif HEART_CLASS::motifDiscoveryAlgorithm(const QVector<double>& s
             group.center[i] = (A[i] + B[i]) / 2.0;
         }
 
-        while (!A.isEmpty() && !B.isEmpty()) {
-            auto next = findNextNeighbor(signal, group.center, length);
-            if (next.isEmpty()) break;
-
-            double bs = calculateBitsave(group.center, next, dist);
-            if (bs > group.bitSave) {
-                group = addToGroup(group, next);
-            } else {
-                break;
-            }
-        }
-
         if (group.bitSave > maxBitSave) {
             maxBitSave = group.bitSave;
             motif = group;
         }
+
+        // while (!A.isEmpty() && !B.isEmpty()) {
+        //     auto next = findNextNeighbor(signal, group.center, length);
+        //     if (next.isEmpty()) break;
+
+        //     double bs = calculateBitsave(group.center, next, dist);
+        //     if (bs > group.bitSave) {
+        //         group = addToGroup(group, next);
+        //     } else {
+        //         break;
+        //     }
+        // }
+
+
     }
     return motif;
 }
@@ -215,11 +217,6 @@ void HEART_CLASS::classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs
     HEART_CLASS::AnomalyDetectionResult detectedAnomalies = HEART_CLASS::detectAnomalies(ecgSignal);
 
     for (int i = 0; i < numQrs-1; ++i) {
-        if (i == numQrs - 1) {
-            detectionVector[i] = "Undefined";
-            continue;
-        }
-
         bool continueLoop = false;
         for (int k = 0; k < detectedAnomalies.anomalyIndices.size()-1; k++){
             if (qrs_onset_idx[i] < detectedAnomalies.anomalyIndices[k] && qrs_end_idx[i] > detectedAnomalies.anomalyIndices[k]){
@@ -229,22 +226,21 @@ void HEART_CLASS::classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs
         }
         if (continueLoop) continue;
 
-
-        // BPM calculation
+        // Rozróżnienie po pulsie
         double bpm = 60.0 / (timeVector[qrs_onset_idx[i + 1]] - timeVector[qrs_onset_idx[i]]);
         if (bpm < 100.0) {
             detectionVector[i] = "Undefined";
             continue;
         }
 
-        // QRS duration
+        // Rozróżnienie po czasie trwania QRS
         double qrsDuration = timeVector[qrs_end_idx[i]] - timeVector[qrs_onset_idx[i]];
         if (qrsDuration < 0.12) {
             detectionVector[i] = "Undefined";
             continue;
         }
 
-        // Voltage analysis at the start of the QRS segment
+        // Wyznaczanie amplitudy Vi
         int startIdx = qrs_onset_idx[i];
         int endIdx = startIdx + static_cast<int>(std::round(0.04 / (timeVector[1] - timeVector[0])));
         double baselineVoltageStart = ecgSignal[startIdx];
@@ -253,7 +249,7 @@ void HEART_CLASS::classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs
 
         double Vi = std::abs(baselineVoltageStart - minVoltageStart) + std::abs(minVoltageStart - maxVoltageStart);
 
-        // Voltage analysis at the end of the QRS segment
+        // Wyznaczanie amplitudy Vt
         endIdx = qrs_end_idx[i];
         startIdx = endIdx - static_cast<int>(std::round(0.04 / (timeVector[1] - timeVector[0])));
         double baselineVoltageEnd = ecgSignal[endIdx];
@@ -262,7 +258,7 @@ void HEART_CLASS::classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs
 
         double Vt = std::abs(baselineVoltageEnd - minVoltageEnd) + std::abs(minVoltageEnd - maxVoltageEnd);
 
-        // Classification based on Vi and Vt
+        // Rozróżnienie w opraciu o amplitudy Vi i Vt
         if (Vi < Vt) {
             detectionVector[i] = "VT";
         } else {
