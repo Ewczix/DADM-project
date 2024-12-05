@@ -74,13 +74,13 @@ void HRV_DFA::analyze(const QVector<double>& rr_intervals){//, const QVector<int
     // F(n)1
     QVector<double> F_n1(n1.size());
     for (int i = 0; i < n1.size(); ++i) {
-        F_n1[i] = computeFluctuation(y, n1[i]);
+        F_n1[i] = fluktuacja(y, n1[i]);
     }
 
     // F(n)2
     QVector<double> F_n2(n2.size());
     for (int i = 0; i < n2.size(); ++i) {
-        F_n2[i] = computeFluctuation(y, n2[i]);
+        F_n2[i] = fluktuacja(y, n2[i]);
     }
 
     QVector<double> log_n1(n1.size()), log_F_n1(n1.size());

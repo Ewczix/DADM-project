@@ -3,13 +3,14 @@
 #include <QVector>
 #include <QDebug>
 #include <algorithm>
+
 QVector<float> PanTompkins::normalize(QVector<float>& v) const
 {
     // Maksymalna i minimalna wartość wektora
     float max = *std::max_element(v.begin(), v.end());
     float min = *std::min_element(v.begin(), v.end());
 
-    // Maksymalną wartość bezwzględna
+    // Maksymalna wartość bezwzględna
     float maxAbs = qMax(qAbs(max), qAbs(min));
     for (float& element : v)
         element /= maxAbs;
@@ -101,10 +102,10 @@ QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electroc
 {
     m_fs = fs;
 
-    // 1. Filtracja sygnału
+    // Filtracja sygnału
     QVector<float> signal1 = filter(*electrocardiogram_signal, 5, 15);
 
-    // 2. Różniczkowanie
+    // Różniczkowanie
     QVector<float> signal2(signal1.size());
     for (int i = 2; i < signal1.size() - 2; ++i)
     {
@@ -112,18 +113,18 @@ QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electroc
     }
     normalize(signal2);
 
-    // 3. Podniesienie do kwadratu
+    // Podniesienie do kwadratu
     for (float& value : signal2)
         value = qPow(value, 2);
     normalize(signal2);
 
-    // 4. Wygładzanie za pomocą uśrednienia
+    // Wygładzanie za pomocą uśrednienia
     int C = 0.15 * m_fs; // Rozmiar okna wygładzania (proporcjonalny do fs)
     QVector<float> window(C, 1. / C); // Tworzenie okna wygładzania
     QVector<float> signal3 = conv(window, signal2);
     normalize(signal3); // Normalizacja wygładzonego
 
-    // 5. Detekcja szczytów
+    // Detekcja szczytów
     QVector<int> peaks;
     QVector<int> false_peaks;
     const int halfWindow = 360;
@@ -167,4 +168,3 @@ QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electroc
 
     return peaks_ekg;
 }
-

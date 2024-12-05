@@ -18,7 +18,7 @@ class ECG_Data : public QMainWindow
 
 public:
     explicit ECG_Data(QWidget *parent = nullptr); // Konstruktor dla GUI
-    explicit ECG_Data(double samplingRate, QWidget *parent = nullptr); // Konstruktor z samplingRate
+    explicit ECG_Data(float samplingRate, QWidget *parent = nullptr); // Konstruktor z samplingRate
 
     ~ECG_Data();
 
@@ -26,25 +26,22 @@ public:
     void loadData(const QString &filepath);
 
     // Funkcje do przechowywania przetworzonych danych
-    void store_processed_data(const QVector<double> &ch1, const QVector<double> &ch2);
-
+    void store_processed_data(const QVector<float> &ch1, const QVector<float> &ch2);
     // Funkcje do pobrania surowych danych
-    QVector<double> getRawCh1() const;
-    QVector<double> getRawCh2() const;
+    QVector<float> getRawCh(bool numch) const;
 
     // Funkcje do pobrania przetworzonych danych
-    QVector<double> getProcessedCh1() const;
-    QVector<double> getProcessedCh2() const;
+    QVector<float> getProcessedCh(bool numch) const;
 
 private:
     Ui::ECG_Data *ui;
 
-    QVector<double> raw_ch1;          // Surowe dane dla kanału 1
-    QVector<double> raw_ch2;          // Surowe dane dla kanału 2
-    QVector<double> processed_ch1;    // Przetworzone dane dla kanału 1
-    QVector<double> processed_ch2;    // Przetworzone dane dla kanału 2
+    QVector<float> raw_ch1;          // Surowe dane dla kanału 1
+    QVector<float> raw_ch2;          // Surowe dane dla kanału 2
+    QVector<float> processed_ch1;    // Przetworzone dane dla kanału 1
+    QVector<float> processed_ch2;    // Przetworzone dane dla kanału 2
 
-    double sampling_rate = 360.0;     // Częstotliwość próbkowania (domyślnie 360)
+    float sampling_rate = 360.0;     // Częstotliwość próbkowania (domyślnie 360)
 };
 
 #endif // ECG_DATA_H
