@@ -16,7 +16,7 @@ ECG_Data::ECG_Data(QWidget *parent)
 }
 
 // Konstruktor z samplingRate
-ECG_Data::ECG_Data(double samplingRate, QWidget *parent)
+ECG_Data::ECG_Data(float samplingRate, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::ECG_Data), sampling_rate(samplingRate)
 {
     ui->setupUi(this);
@@ -65,28 +65,30 @@ void ECG_Data::loadData(const QString &filepath) {
 }
 
 // Funkcja do przechowywania przetworzonych danych
-void ECG_Data::store_processed_data(const QVector<double> &ch1, const QVector<double> &ch2) {
+void ECG_Data::store_processed_data(const QVector<float> &ch1, const QVector<float> &ch2) {
     processed_ch1 = ch1;
     processed_ch2 = ch2;
     qDebug() << "Przetworzone dane zapisane: Kanał 1 =" << processed_ch1.size() << "próbek, Kanał 2 =" << processed_ch2.size() << "próbek.";
 }
 
-// Funkcja do pobrania surowych danych dla kanału 1
-QVector<double> ECG_Data::getRawCh1() const {
-    return raw_ch1;
+// Funkcja do pobrania surowych danych dla 2 kanałów (True/1 - pierwszy kanał, False/0 - drugi kanał)
+QVector<float> ECG_Data::getRawCh(bool numch) const {
+
+    if (numch){
+        return raw_ch1;
+    }
+    else{
+       return raw_ch2;
+    }
 }
 
-// Funkcja do pobrania surowych danych dla kanału 2
-QVector<double> ECG_Data::getRawCh2() const {
-    return raw_ch2;
-}
+// Funkcja do pobrania przetworzonych danych dla 2 kanałów (True/1 - pierwszy kanał, False/0 - drugi kanał)
+QVector<float> ECG_Data::getProcessedCh(bool numch) const {
 
-// Funkcja do pobrania przetworzonych danych dla kanału 1
-QVector<double> ECG_Data::getProcessedCh1() const {
-    return processed_ch1;
-}
-
-// Funkcja do pobrania przetworzonych danych dla kanału 2
-QVector<double> ECG_Data::getProcessedCh2() const {
-    return processed_ch2;
+    if (numch){
+        return processed_ch1;
+    }
+    else{
+        return processed_ch2;
+    }
 }
