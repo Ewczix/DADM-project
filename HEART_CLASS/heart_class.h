@@ -15,6 +15,15 @@ class HEART_CLASS : public QMainWindow
 
 public:
 
+
+    HEART_CLASS(double samplingFrequency, QWidget *parent = nullptr);
+    ~HEART_CLASS();
+
+    void classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs_onset_idx, QVector<int> qrs_end_idx);
+    QVector<QString> getClassifications();
+
+private:
+
     struct Motif {
         double bitSave;
         QVector<double> center;
@@ -26,14 +35,6 @@ public:
         QVector<double> center;
     };
 
-    HEART_CLASS(double samplingFrequency, QWidget *parent = nullptr);
-    ~HEART_CLASS();
-
-    AnomalyDetectionResult detectAnomalies(const QVector<double>& ecgSignal);
-    void classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs_onset_idx, QVector<int> qrs_end_idx);
-    QVector<QString> getClassifications();
-
-private:
     Ui::HEART_CLASS *ui;
 
     QVector<double> ecgSignal;
@@ -41,6 +42,7 @@ private:
     int motifLength;
     QVector<QString> classificationResults;
 
+    AnomalyDetectionResult detectAnomalies(const QVector<double>& ecgSignal);
     Motif motifDiscoveryAlgorithm(const QVector<double>& signal, double samplingFrequency);
     unsigned int calculateStartingLength(double samplingFrequency);
     QVector<QVector<double>> extractSubsequences(const QVector<double>& signal, int m);

@@ -208,13 +208,13 @@ void HEART_CLASS::classifyQRS(const QVector<double>& ecgSignal, QVector<int> qrs
         return;
     }
     QVector<QString> detectionVector(numQrs, "Undefined");
-    QVector<double> timeVector = generateTimeVector(HEART_CLASS::samplingRate, numQrs);
+    QVector<double> timeVector = generateTimeVector(HEART_CLASS::samplingRate, ecgSignal.size());
     HEART_CLASS::AnomalyDetectionResult detectedAnomalies = HEART_CLASS::detectAnomalies(ecgSignal);
 
     for (int i = 0; i < numQrs-1; ++i) {
         bool continueLoop = false;
         for (int k = 0; k < detectedAnomalies.anomalyIndices.size()-1; k++){
-            if (qrs_onset_idx[i] < detectedAnomalies.anomalyIndices[k] && qrs_end_idx[i] > detectedAnomalies.anomalyIndices[k]){
+            if (qrs_onset_idx[i] < detectedAnomalies.anomalyIndices[k] && qrs_onset_idx[i+1] > detectedAnomalies.anomalyIndices[k]){
                 detectionVector[i] = "Anomaly";
                 continueLoop = true;
             }
