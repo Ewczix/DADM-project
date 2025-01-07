@@ -3,19 +3,10 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <Eigen/Dense>
 
 // Konstruktor, inicjalizacja stałych
-HRV_DFA::HRV_DFA() : alpha1(0.0), alpha2(0.0){}//,
-    // n1([] {
-    //     QVector<int> temp;
-    //     for (int i = 10; i <= 40; ++i) temp.append(i);
-    //     return temp;
-    // }()),
-    // n2([] {
-    //     QVector<int> temp;
-    //     for (int i = 40; i <= 256; ++i) temp.append(i);
-    //     return temp;
-    // }()) {}
+HRV_DFA::HRV_DFA() : alpha1(0.0), alpha2(0.0){}
 
 // Fluktuacja
 double HRV_DFA::fluktuacja(const QVector<double>& y, int n) {
@@ -50,19 +41,28 @@ double HRV_DFA::fluktuacja(const QVector<double>& y, int n) {
 // polyfit
 std::pair<double, double> HRV_DFA::polyfit(const QVector<double>& x, const QVector<double>& y) {
     int N = x.size();
-    double sum_x = std::accumulate(x.begin(), x.end(), 0.0);
-    double sum_y = std::accumulate(y.begin(), y.end(), 0.0);
-    double sum_xx = std::inner_product(x.begin(), x.end(), x.begin(), 0.0);
-    double sum_xy = std::inner_product(x.begin(), x.end(), y.begin(), 0.0);
 
-    double slope = (N * sum_xy - sum_x * sum_y) / (N * sum_xx - sum_x * sum_x);
-    double intercept = (sum_y - slope * sum_x) / N;
-
-    return {slope, intercept};
+    Eigen::VectorXd X(N), Y(N);
+    for (int i = 0; i < N; ++i) {
+        X[i] = x[i];
+        Y[i] = y[i];
     }
 
+    // Tworzenie macierzy projektującej A
+    Eigen::MatrixXd A(N, 2);
+    A.col(0) = X;
+    A.col(1) = Eigen::VectorXd::Ones(N);
+
+    Eigen::VectorXd coeffs = A.colPivHouseholderQr().solve(Y);
+
+    double slope = coeffs[0];
+    double intercept = coeffs[1];
+
+    return {slope, intercept};
+}
+
 // DFA
-void HRV_DFA::analyze(const QVector<double>& rr_intervals){//, const QVector<int>& n1, const QVector<int>& n2) {
+void HRV_DFA::analyze(const QVector<double>& rr_intervals){
 
     double rr_mean = std::accumulate(rr_intervals.begin(), rr_intervals.end(), 0.0) / rr_intervals.size();
 
