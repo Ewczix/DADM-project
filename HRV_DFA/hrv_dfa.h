@@ -3,29 +3,33 @@
 
 #include <QVector>
 #include <utility>
-#include <cmath>
-#include <numeric>
-#include <algorithm>
-#include <iostream>
 
 class HRV_DFA
 {
-    Q_OBJECT
 private:
     double alpha1;
     double alpha2;
 
-    //QVector<int> n1;
-    //QVector<int> n2;
+    const QVector<int> n1 = [] {
+        QVector<int> temp;
+        for (int i = 10; i <= 40; ++i) temp.append(i);
+        return temp;
+    }();
 
-    double fluktuacja(const std::vector<double>& y, int n);
+    const QVector<int> n2 = [] {
+        QVector<int> temp;
+        for (int i = 40; i <= 256; ++i) temp.append(i);
+        return temp;
+    }();
+
+    double fluktuacja(const QVector<double>& y, int n);
     std::pair<double, double> polyfit(const QVector<double>& x, const QVector<double>& y);
 
 public:
     // Konstruktor
     HRV_DFA();
     // DFA
-    void analyze(const std::vector<int>& rr_intervals); // const QVector<int>& n1, const QVector<int>& n2);
+    void analyze(const QVector<double>& rr_intervals);
     // alpha1 i alpha2
     std::pair<double, double> getParams() const;
 };
