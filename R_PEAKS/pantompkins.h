@@ -1,5 +1,5 @@
-#ifndef PanTompkins_H
-#define PanTompkins_H
+#ifndef PANTOMPKINS_H
+#define PANTOMPKINS_H
 #include <QObject>
 #include <QDebug>
 #include <QVector>
@@ -13,7 +13,7 @@ public:
      *  @param fs - częstotliwość próbkowania
      *  @return Indeksy szczytów R
      */
-    QVector<int> getPeaks(QSharedPointer<const QVector<float>> electrocardiogram_signal, int fs = 360);
+    QVector<int> getPeaks(QVector<float> electrocardiogram_signal, int fs = 360);
     QVector<float> normalize(QVector<float>& v) const;
 
 private:
@@ -26,4 +26,4 @@ private:
     QVector<T> conv(const QVector<T>& f, const QVector<T>& g) const;
 };
 
-#endif // PanTompkins_H
+#endif // PANTOMPKINS_H
