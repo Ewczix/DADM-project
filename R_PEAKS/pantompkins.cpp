@@ -10,11 +10,11 @@ QVector<float> PanTompkins::normalize(QVector<float>& v) const
     float max = *std::max_element(v.begin(), v.end());
     float min = *std::min_element(v.begin(), v.end());
 
-    // Maksymalna wartość bezwzględna
+    // Maksymalną wartość bezwzględna
     float maxAbs = qMax(qAbs(max), qAbs(min));
     for (float& element : v)
         element /= maxAbs;
-    qDebug()<<"normalize wywolane";
+  //  qDebug()<<"normalize wywolane";
     return v;
 }
 
@@ -98,14 +98,14 @@ QVector<float> PanTompkins::filter(const QVector<float>& signal, float fc1, floa
     return c2;
 }
 
-QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electrocardiogram_signal, int fs)
+QVector<int> PanTompkins::getPeaks(QVector<float> electrocardiogram_signal, int fs)
 {
     m_fs = fs;
 
-    // Filtracja sygnału
-    QVector<float> signal1 = filter(*electrocardiogram_signal, 5, 15);
+    // 1. Filtracja sygnału
+    QVector<float> signal1 = filter(electrocardiogram_signal, 5, 15);
 
-    // Różniczkowanie
+    // 2. Różniczkowanie
     QVector<float> signal2(signal1.size());
     for (int i = 2; i < signal1.size() - 2; ++i)
     {
@@ -113,18 +113,18 @@ QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electroc
     }
     normalize(signal2);
 
-    // Podniesienie do kwadratu
+    // 3. Podniesienie do kwadratu
     for (float& value : signal2)
         value = qPow(value, 2);
     normalize(signal2);
 
-    // Wygładzanie za pomocą uśrednienia
+    // 4. Wygładzanie za pomocą uśrednienia
     int C = 0.15 * m_fs; // Rozmiar okna wygładzania (proporcjonalny do fs)
     QVector<float> window(C, 1. / C); // Tworzenie okna wygładzania
     QVector<float> signal3 = conv(window, signal2);
     normalize(signal3); // Normalizacja wygładzonego
 
-    // Detekcja szczytów
+    // 5. Detekcja szczytów
     QVector<int> peaks;
     QVector<int> false_peaks;
     const int halfWindow = 360;
@@ -157,14 +157,14 @@ QVector<int> PanTompkins::getPeaks(QSharedPointer<const QVector<float>> electroc
 
         i += 1;
     }
-    qDebug()<<"getPeaks called";
 
+    // TUTAJ TO WYKRYWANIE KONKRETNE
     QVector<int> peaks_ekg;
-    std::for_each(peaks.begin(), peaks.end(), [electrocardiogram_signal, &peaks_ekg, fs](int peak) {
-        auto local = std::max_element(electrocardiogram_signal->begin() + peak - int(0.150 * fs), electrocardiogram_signal->begin() + peak + int(0.150 * fs));
-        int local_idx = std::distance(electrocardiogram_signal->begin(), local);
+    std::for_each(peaks.begin(), peaks.end(), [&electrocardiogram_signal, &peaks_ekg, fs](int peak) {
+        auto local = std::max_element(electrocardiogram_signal.begin() + peak - int(0.150 * fs), electrocardiogram_signal.begin() + peak + int(0.150 * fs));
+        int local_idx = std::distance(electrocardiogram_signal.begin(), local);
         peaks_ekg.push_back(local_idx);
     });
-
+    qDebug()<<"pantompkins";
     return peaks_ekg;
 }
