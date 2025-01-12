@@ -1,0 +1,7 @@
+QMainWindow {
+    background-color: #4CAF50;  /* Kolor tła dla całego głównego okna */
+}
+
+QWidget {
+    background-color: #ffffff;  /* Kolor tła dla widgetów */
+}

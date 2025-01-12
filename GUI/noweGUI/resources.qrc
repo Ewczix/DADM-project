@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>close-round-icon.png</file>
+        <file>diagnostic-icon.png</file>
+        <file>ecg-monitoring-icon.png</file>
+        <file>health-insurance-icon.png</file>
+        <file>market-research-icon.png</file>
+        <file>sliders-icon.png</file>
+        <file>logo.png</file>
+    </qresource>
+</RCC>
