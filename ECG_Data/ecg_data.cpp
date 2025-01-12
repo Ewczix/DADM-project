@@ -44,6 +44,10 @@ void ECG_Data::loadData(const QString &filepath) {
     const char *data = fileData.constData();
 
     int sampleCount = fileData.size() / 3; // Każda próbka to 3 bajty (2 próbki 12-bitowe w 3 bajtach)
+
+    // Skala przeskalowania (10mV / 2^11)
+    double scale = 10.0 / 2048.0;
+
     for (int i = 0; i < sampleCount; ++i) {
         int byteIndex = i * 3;
 
@@ -55,8 +59,9 @@ void ECG_Data::loadData(const QString &filepath) {
         if (sample1 & 0x800) sample1 -= 0x1000;
         if (sample2 & 0x800) sample2 -= 0x1000;
 
-        raw_ch1.append(sample1);
-        raw_ch2.append(sample2);
+        // Przeskalowanie danych na mV
+        raw_ch1.append(sample1 * scale);  // Skalowanie na miliwolty
+        raw_ch2.append(sample2 * scale);  // Skalowanie na miliwolty
     }
 
     file.close();
@@ -64,15 +69,16 @@ void ECG_Data::loadData(const QString &filepath) {
     qDebug() << "Wczytano dane: Kanał 1 =" << raw_ch1.size() << "próbek, Kanał 2 =" << raw_ch2.size() << "próbek.";
 }
 
+
 // Funkcja do przechowywania przetworzonych danych
-void ECG_Data::store_processed_data(const QVector<float> &ch1, const QVector<float> &ch2) {
+void ECG_Data::store_processed_data(const QVector<double> &ch1, const QVector<double> &ch2) {
     processed_ch1 = ch1;
     processed_ch2 = ch2;
     qDebug() << "Przetworzone dane zapisane: Kanał 1 =" << processed_ch1.size() << "próbek, Kanał 2 =" << processed_ch2.size() << "próbek.";
 }
 
 // Funkcja do pobrania surowych danych dla 2 kanałów (True/1 - pierwszy kanał, False/0 - drugi kanał)
-QVector<float> ECG_Data::getRawCh(bool numch) const {
+QVector<double> ECG_Data::getRawCh(bool numch) const {
 
     if (numch){
         return raw_ch1;
@@ -83,7 +89,7 @@ QVector<float> ECG_Data::getRawCh(bool numch) const {
 }
 
 // Funkcja do pobrania przetworzonych danych dla 2 kanałów (True/1 - pierwszy kanał, False/0 - drugi kanał)
-QVector<float> ECG_Data::getProcessedCh(bool numch) const {
+QVector<double> ECG_Data::getProcessedCh(bool numch) const {
 
     if (numch){
         return processed_ch1;
@@ -92,3 +98,7 @@ QVector<float> ECG_Data::getProcessedCh(bool numch) const {
         return processed_ch2;
     }
 }
+
+
+
+

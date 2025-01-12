@@ -26,20 +26,23 @@ public:
     void loadData(const QString &filepath);
 
     // Funkcje do przechowywania przetworzonych danych
-    void store_processed_data(const QVector<float> &ch1, const QVector<float> &ch2);
+    void store_processed_data(const QVector<double> &ch1, const QVector<double> &ch2);
+    // Funkcje do wizualizacji danych
+    void visualizeData(QWidget *parent = nullptr);
+
     // Funkcje do pobrania surowych danych
-    QVector<float> getRawCh(bool numch) const;
+    QVector<double> getRawCh(bool numch) const;
 
     // Funkcje do pobrania przetworzonych danych
-    QVector<float> getProcessedCh(bool numch) const;
+    QVector<double> getProcessedCh(bool numch) const;
 
 private:
     Ui::ECG_Data *ui;
 
-    QVector<float> raw_ch1;          // Surowe dane dla kanału 1
-    QVector<float> raw_ch2;          // Surowe dane dla kanału 2
-    QVector<float> processed_ch1;    // Przetworzone dane dla kanału 1
-    QVector<float> processed_ch2;    // Przetworzone dane dla kanału 2
+    QVector<double> raw_ch1;          // Surowe dane dla kanału 1
+    QVector<double> raw_ch2;          // Surowe dane dla kanału 2
+    QVector<double> processed_ch1;    // Przetworzone dane dla kanału 1
+    QVector<double> processed_ch2;    // Przetworzone dane dla kanału 2
 
     float sampling_rate = 360.0;     // Częstotliwość próbkowania (domyślnie 360)
 };
