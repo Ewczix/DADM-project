@@ -1,4 +1,5 @@
-#include "HRV_DFA.h"
+#include "hrv_dfa.h"
+
 #include <numeric>
 #include <iostream>
 #include <algorithm>
@@ -39,7 +40,8 @@ double HRV_DFA::fluktuacja(const QVector<double>& y, int n) {
 }
 
 // polyfit
-std::pair<double, double> HRV_DFA::polyfit(const QVector<double>& x, const QVector<double>& y) {
+std::pair<double, double> HRV_DFA::polyfit(const QVector<double>& x,
+                                           const QVector<double>& y) {
     int N = x.size();
 
     Eigen::VectorXd X(N), Y(N);
@@ -48,7 +50,6 @@ std::pair<double, double> HRV_DFA::polyfit(const QVector<double>& x, const QVect
         Y[i] = y[i];
     }
 
-    // Tworzenie macierzy projektującej A
     Eigen::MatrixXd A(N, 2);
     A.col(0) = X;
     A.col(1) = Eigen::VectorXd::Ones(N);
@@ -83,8 +84,10 @@ void HRV_DFA::analyze(const QVector<double>& rr_intervals){
         F_n2[i] = fluktuacja(y, n2[i]);
     }
 
-    QVector<double> log_n1(n1.size()), log_F_n1(n1.size());
-    QVector<double> log_n2(n2.size()), log_F_n2(n2.size());
+    log_n1.resize(n1.size());
+    log_F_n1.resize(n1.size());
+    log_n2.resize(n2.size());
+    log_F_n2.resize(n2.size());
 
     std::transform(n1.begin(), n1.end(), log_n1.begin(), [](int n) { return std::log(n); });
     std::transform(F_n1.begin(), F_n1.end(), log_F_n1.begin(), [](double F) { return std::log(F); });
@@ -92,11 +95,9 @@ void HRV_DFA::analyze(const QVector<double>& rr_intervals){
     std::transform(n2.begin(), n2.end(), log_n2.begin(), [](int n) { return std::log(n); });
     std::transform(F_n2.begin(), F_n2.end(), log_F_n2.begin(), [](double F) { return std::log(F); });
 
-    // Alpha1 i alpha2 jako nachylenie linii regresji
     alpha1 = polyfit(log_n1, log_F_n1).first;
     alpha2 = polyfit(log_n2, log_F_n2).first;
 
-    // Wyniki
     std::cout << "Alpha1: " << alpha1 << std::endl;
     std::cout << "Alpha2: " << alpha2 << std::endl;
 }
@@ -106,6 +107,9 @@ std::pair<double, double> HRV_DFA::getParams() const {
     return {alpha1, alpha2};
 }
 
-
-
-
+// Punkty
+QPair<QVector<double>, QVector<double>> HRV_DFA::getPoints() const {
+    QVector<double> log_n = log_n1 + log_n2;
+    QVector<double> log_F = log_F_n1 + log_F_n2;
+    return {log_n, log_F};
+}
