@@ -7,7 +7,7 @@
 #include <Eigen/Dense>
 
 // Konstruktor, inicjalizacja stałych
-HRV_DFA::HRV_DFA() : alpha1(0.0), alpha2(0.0){}
+HRV_DFA::HRV_DFA() : alpha1(0.0), alpha2(0.0), intercept1(0.0), intercept2(0.0){}
 
 // Fluktuacja
 double HRV_DFA::fluktuacja(const QVector<double>& y, int n) {
@@ -96,15 +96,18 @@ void HRV_DFA::analyze(const QVector<double>& rr_intervals){
     std::transform(F_n2.begin(), F_n2.end(), log_F_n2.begin(), [](double F) { return std::log(F); });
 
     alpha1 = polyfit(log_n1, log_F_n1).first;
+    intercept1 = polyfit(log_n1, log_F_n1).second;
+
     alpha2 = polyfit(log_n2, log_F_n2).first;
+    intercept2 = polyfit(log_n2, log_F_n2).second;
 
     std::cout << "Alpha1: " << alpha1 << std::endl;
     std::cout << "Alpha2: " << alpha2 << std::endl;
 }
 
-// Pobieranie wyników (alpha1 i alpha2)
-std::pair<double, double> HRV_DFA::getParams() const {
-    return {alpha1, alpha2};
+// Pobieranie wyników (alpha1, alpha2 i wyrazów wolnych)
+std::tuple<double, double, double, double> HRV_DFA::getParams() const {
+    return {alpha1, alpha2, intercept1, intercept2};
 }
 
 // Punkty
