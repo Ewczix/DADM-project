@@ -12,13 +12,15 @@ public:
     // DFA
     void analyze(const QVector<double>& rr_intervals);
     // alpha1 i alpha2
-    std::pair<double, double> getParams() const;
+    std::tuple<double, double, double, double> getParams() const;
     // Punkty
     QPair<QVector<double>, QVector<double>> getPoints() const;
 
 private:
     double alpha1;
     double alpha2;
+    double intercept1;
+    double intercept2;
 
     QVector<double> log_n1, log_F_n1;
     QVector<double> log_n2, log_F_n2;
