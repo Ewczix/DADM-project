@@ -27,13 +27,13 @@ private:
 
     const QVector<int> n1 = [] {
         QVector<int> temp;
-        for (int i = 10; i <= 40; ++i) temp.append(i);
+        for (int i = 4; i <= 16; ++i) temp.append(i);
         return temp;
     }();
 
     const QVector<int> n2 = [] {
         QVector<int> temp;
-        for (int i = 40; i <= 256; ++i) temp.append(i);
+        for (int i = 16; i <= 64; ++i) temp.append(i);
         return temp;
     }();
 
